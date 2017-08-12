@@ -60,7 +60,19 @@ export class Authentication {
     }
 
     if (!token && response) {
-      token = this.config.tokenRoot && response.content[this.config.tokenRoot] ? response.content[this.config.tokenRoot][this.config.tokenName] : response.content[this.config.tokenName];
+        let arr = [];
+        if (Array.isArray(this.config.tokenRoot)) {
+            arr = this.config.tokenRoot;
+        } else {
+            arr.push(this.config.tokenRoot);
+            if (this.config.tokenSubRoot) {
+                arr.push(this.config.tokenSubRoot);
+            }
+        }
+
+        let path = arr.reduce((obj, el) => obj && obj[el], response.content);
+
+        token = path && path[this.config.tokenName];
     }
 
     if (!token) {

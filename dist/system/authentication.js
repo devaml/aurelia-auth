@@ -85,7 +85,21 @@ System.register(['aurelia-framework', './baseConfig', './storage', './authUtils'
             }
 
             if (!token && response) {
-              token = this.config.tokenRoot && response.content[this.config.tokenRoot] ? response.content[this.config.tokenRoot][this.config.tokenName] : response.content[this.config.tokenName];
+              var arr = [];
+              if (Array.isArray(this.config.tokenRoot)) {
+                arr = this.config.tokenRoot;
+              } else {
+                arr.push(this.config.tokenRoot);
+                if (this.config.tokenSubRoot) {
+                  arr.push(this.config.tokenSubRoot);
+                }
+              }
+
+              var path = arr.reduce(function (obj, el) {
+                return obj && obj[el];
+              }, response.content);
+
+              token = path && path[this.config.tokenName];
             }
 
             if (!token) {
